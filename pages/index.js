@@ -6,7 +6,7 @@ import { FaPlay } from "react-icons/fa";
 import { BiLogoJavascript, BiSolidFileCss } from "react-icons/bi";
 
 import MonacoEditor, { loader } from "@monaco-editor/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Loading from "@/components/loading";
@@ -118,7 +118,7 @@ export default function Home() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, []); // Tidak ada dependensi, jadi ini hanya dijalankan sekali saat komponen pertama kali dirender
+  }, [javascript]);
 
   return (
     <main
@@ -126,12 +126,16 @@ export default function Home() {
     >
       {/* navbar */}
       <nav className="px-4 bg-main-800 py-1.5 shadow shadow-slate-700/20">
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center relative">
           <div className="text-icon hover:rotate-180 duration-700">
             <BsFillEmojiSmileUpsideDownFill className="w-5 h-5" />
           </div>
 
-          <p className="text-sm font-semibold text-icon-js">javascript</p>
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <p className="text-sm font-semibold text-icon-js select-none">
+              javascript
+            </p>
+          </div>
 
           <div className="flex gap-4 items-center text-sm font-medium ">
             <button className="hover:text-text-800 duration-150">Login</button>
@@ -217,9 +221,11 @@ export default function Home() {
             <div className="w-full border-text-500/20 flex flex-col p-2">
               <div className="flex items-center justify-between pr-4">
                 <p className="font-medium text-sm">Console:</p>
-                <p className="text-xs font-medium text-icon-800">
-                  {consoleOutput.executionTime} ms
-                </p>
+                {consoleOutput && (
+                  <p className="text-xs font-medium text-icon-800">
+                    {consoleOutput.executionTime} ms
+                  </p>
+                )}
               </div>
 
               <div className=" py-2 h-full">
