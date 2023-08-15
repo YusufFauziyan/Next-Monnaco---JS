@@ -1,15 +1,20 @@
-import Image from "next/image";
 import { Inter, Poppins } from "next/font/google";
 import { BsFillEmojiSmileUpsideDownFill } from "react-icons/bs";
-import { AiFillHtml5 } from "react-icons/ai";
 import { FaPlay } from "react-icons/fa";
 import { BiLogoJavascript, BiSolidFileCss } from "react-icons/bi";
 
-import MonacoEditor, { loader } from "@monaco-editor/react";
+import MonacoEditor from "@monaco-editor/react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
 import Loading from "@/components/loading";
+import Select from "@/components/Select";
+import { ChangeLanguage } from "@/hook/MonacoAssist";
+
+import Example from "@/data/example.json";
+import { OptionsMonaco } from "@/hook/ConfigMonaco";
+import { GetTokenId } from "@/hook/Api";
+import { BodyExec } from "@/hook/BodyApi";
 
 const inter = Inter({ subsets: ["latin"] });
 const poppins = Poppins({
@@ -17,84 +22,46 @@ const poppins = Poppins({
   weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
 });
 
+const listLanguages = [
+  {
+    name: "JavaScript",
+    value: "javascript",
+  },
+  {
+    name: "MYSQL",
+    value: "mysql",
+  },
+];
+
 export default function Home() {
   const tokenId = Cookies.get("__tknId")
     ? JSON.parse(Cookies.get("__tknId"))
     : null;
 
   const [loading, setLoading] = useState(false);
-  const [javascript, setJavascript] = useState(examples);
-  const [html, setHtml] = useState("");
-  const [css, setCss] = useState("");
+  const [javascript, setJavascript] = useState(null);
+
+  const [selectedLanguage, setSelectedLanguage] = useState(listLanguages[0]);
 
   const [consoleOutput, setConsoleOutput] = useState("");
 
-  const getTokenId = async () => {
-    try {
-      const { data } = await axios.get(`${process.env.API_URL}/getIdAndToken`);
-
-      Cookies.set("__tknId", JSON.stringify(data));
-    } catch (error) {
-      console.log("failed to get token");
-    }
-  };
-
   useEffect(() => {
     if (!tokenId) {
-      getTokenId();
+      GetTokenId();
     }
   }, [tokenId]);
 
   const handleSubmitCode = async () => {
     setLoading(true);
+    const body = BodyExec("javascript", javascript);
+
     try {
-      const { data } = await axios.post(`${process.env.API_URL}/code/exec`, {
-        name: "JavaScript",
-        title: tokenId?.id,
-        version: "ES6",
-        mode: "javascript",
-        description: null,
-        extension: "js",
-        languageType: "programming",
-        active: true,
-        properties: {
-          language: "javascript",
-          docs: true,
-          tutorials: true,
-          cheatsheets: true,
-          filesEditable: true,
-          filesDeletable: true,
-          files: [
-            {
-              name: "index.js",
-              content: javascript,
-            },
-          ],
-          newFileOptions: [
-            {
-              helpText: "New JS file",
-              name: "script${i}.js",
-              content:
-                "/**\n *  In main file\n *  let script${i} = require('./script${i}');\n *  console.log(script${i}.sum(1, 2));\n */\n\nfunction sum(a, b) {\n    return a + b;\n}\n\nmodule.exports = { sum };",
-            },
-            {
-              helpText: "Add Dependencies",
-              name: "package.json",
-              content:
-                '{\n  "name": "main_app",\n  "version": "1.0.0",\n  "description": "",\n  "main": "HelloWorld.js",\n  "dependencies": {\n    "lodash": "^4.17.21"\n  }\n}',
-            },
-          ],
-        },
-        visibility: "public",
-        _id: tokenId?.id,
-        user: null,
-        idToken: tokenId?.token,
-      });
+      const { data } = await axios.post(
+        `${process.env.API_URL}/code/exec`,
+        body
+      );
 
       setLoading(false);
-
-      console.log(data);
-
       setConsoleOutput(data);
     } catch (error) {
       setLoading(false);
@@ -120,6 +87,20 @@ export default function Home() {
     };
   }, [javascript]);
 
+  // get example value in data/example.json
+  useEffect(() => {
+    if (selectedLanguage) {
+      const ex = Example.filter((ex) => ex.lang === selectedLanguage.value)[0]
+        .syntax;
+
+      setJavascript(ex);
+    }
+  }, [selectedLanguage]);
+
+  useEffect(() => {
+    ChangeLanguage("javascript");
+  }, []);
+
   return (
     <main
       className={`${poppins.className} text-text-500 bg-main-500 h-[100vh] overflow-hidden`}
@@ -131,10 +112,15 @@ export default function Home() {
             <BsFillEmojiSmileUpsideDownFill className="w-5 h-5" />
           </div>
 
-          <div className="absolute left-1/2 -translate-x-1/2">
-            <p className="text-sm font-semibold text-icon-js select-none">
+          <div className="absolute left-1/2 -translate-x-1/2 z-30">
+            {/* <p className="text-sm font-semibold text-icon-js select-none">
               javascript
-            </p>
+            </p> */}
+            <Select
+              data={listLanguages}
+              setSelected={setSelectedLanguage}
+              selected={selectedLanguage}
+            />
           </div>
 
           <div className="flex gap-4 items-center text-sm font-medium ">
@@ -149,38 +135,11 @@ export default function Home() {
 
       {/* Content */}
       <div className="flex h-full">
-        {/* sidebar */}
-        <div className="w-[15%] shadow-sm shadow-text-800/30  py-4 flex flex-col">
-          {/* <div className="flex gap-2 items-center px-4 py-1.5">
-            <AiFillHtml5 className="w-5 h-5 text-icon-html" />
-            <p className="text-xs font-medium tracking-wide">index.html</p>
-          </div> */}
-          {/* <div className="flex gap-2 items-center px-4 py-1.5">
-            <BiSolidFileCss className="w-5 h-5 text-icon-css" />
-            <p className="text-xs font-medium tracking-wide">style.css</p>
-          </div> */}
-          <div className="flex gap-2 items-center px-4 py-1.5 bg-main-800">
-            <BiLogoJavascript className="w-5 h-5 text-icon-js" />
-            <p className="text-xs font-medium tracking-wide">index.js</p>
-          </div>
-        </div>
-        {/* end sidebar */}
-
         {/* content */}
         <div className="w-full">
           {/* navbar content */}
-          <div className="shadow shadow-main-800 font-medium flex justify-between text-sm py-2">
-            <div className="flex">
-              {/* <button className="px-4 border-r border-text-500">
-                index.html
-              </button>
-              <button className="px-4 border-r border-text-500">
-                style.css
-              </button> */}
-              <button className="px-4 border-text-500 text-text-800">
-                index.js
-              </button>
-            </div>
+          <div className="shadow shadow-main-800 font-medium flex justify-between text-sm py-2 mt-2">
+            <div />
             <button
               className="pr-6 text-icon-800 hover:opacity-50 duration-150"
               onClick={handleSubmitCode}
@@ -205,9 +164,9 @@ export default function Home() {
               height="100%"
               path={"javascript"}
               value={javascript || ""}
-              defaultValue={examples || ""}
+              defaultValue={""}
               defaultLanguage={"javascript"}
-              options={options}
+              options={OptionsMonaco}
               onChange={(value) => {
                 setJavascript(value);
               }}
@@ -237,7 +196,7 @@ export default function Home() {
                   value={consoleOutput.stdout || consoleOutput.stderr || ""}
                   defaultValue={""}
                   defaultLanguage={"json"}
-                  options={{ readOnly: true, ...options }}
+                  options={{ readOnly: true, ...OptionsMonaco }}
                   // beforeMount={handleEditorWillMount}
                 />
               </div>
@@ -255,90 +214,3 @@ export default function Home() {
     </main>
   );
 }
-
-// const defineTheme = (theme) => {
-//   return new Promise((res) => {
-//     Promise.all([
-//       loader.init(),
-//       import(`monaco-themes/themes/${theme}.json`),
-//     ]).then(([monaco, themeData]) => {
-//       console.log(monaco);
-//       monaco.editor.defineTheme(theme, themeData);
-//       res();
-//     });
-//   });
-// };
-
-const options = {
-  acceptSuggestionOnCommitCharacter: true,
-  acceptSuggestionOnEnter: "on",
-  accessibilitySupport: "auto",
-  autoIndent: false,
-  automaticLayout: true,
-  codeLens: true,
-  colorDecorators: true,
-  contextmenu: true,
-  cursorBlinking: "blink",
-  cursorSmoothCaretAnimation: false,
-  cursorStyle: "line",
-  disableLayerHinting: false,
-  disableMonospaceOptimizations: false,
-  dragAndDrop: false,
-  fixedOverflowWidgets: false,
-  folding: true,
-  foldingStrategy: "auto",
-  fontLigatures: false,
-  formatOnPaste: false,
-  formatOnType: false,
-  hideCursorInOverviewRuler: false,
-  highlightActiveIndentGuide: true,
-  links: true,
-  mouseWheelZoom: false,
-  multiCursorMergeOverlapping: true,
-  multiCursorModifier: "alt",
-  overviewRulerBorder: true,
-  overviewRulerLanes: 2,
-  quickSuggestions: true,
-  quickSuggestionsDelay: 100,
-  renderControlCharacters: false,
-  renderFinalNewline: true,
-  renderIndentGuides: true,
-  renderLineHighlight: "all",
-  renderWhitespace: "none",
-  revealHorizontalRightPadding: 30,
-  roundedSelection: true,
-  rulers: [],
-  scrollBeyondLastColumn: 5,
-  scrollBeyondLastLine: true,
-  selectOnLineNumbers: true,
-  selectionClipboard: true,
-  selectionHighlight: true,
-  showFoldingControls: "mouseover",
-  smoothScrolling: false,
-  suggestOnTriggerCharacters: true,
-  wordBasedSuggestions: true,
-  wordSeparators: "~!@#$%^&*()-=+[{]}|;:'\",.<>/?",
-  wordWrap: "off",
-  wordWrapBreakAfterCharacters: "\t})]?|&,;",
-  wordWrapBreakBeforeCharacters: "{([+",
-  wordWrapBreakObtrusiveCharacters: ".",
-  wordWrapColumn: 80,
-  wordWrapMinified: true,
-  wrappingIndent: "none",
-};
-
-const examples = `// Example program
-
-const data = [
-  { "hari": "Senin", "nilai": 30 },
-  { "hari": "Selasa", "nilai": 40 },
-  { "hari": "Rabu", "nilai": 35 },
-  { "hari": "Kamis", "nilai": 55 },
-  { "hari": "Jumat", "nilai": 60 },
-  { "hari": "Sabtu", "nilai": 45 },
-  { "hari": "Minggu", "nilai": 20 }
-]
-
-console.log(data)
-
-`;

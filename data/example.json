@@ -1,0 +1,10 @@
+[
+    {
+        "lang": "javascript",
+        "syntax": "// Example program\n\nconst data = [\n  { \"hari\": \"Senin\", \"nilai\": 30 },\n  { \"hari\": \"Selasa\", \"nilai\": 40 },\n  { \"hari\": \"Rabu\", \"nilai\": 35 },\n  { \"hari\": \"Kamis\", \"nilai\": 55 },\n  { \"hari\": \"Jumat\", \"nilai\": 60 },\n  { \"hari\": \"Sabtu\", \"nilai\": 45 },\n  { \"hari\": \"Minggu\", \"nilai\": 20 }\n]\n\nconsole.log(data)\n\n"
+    },
+    {
+        "lang": "mysql",
+        "syntax": "\n-- create\nCREATE TABLE EMPLOYEE (\n  empId INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  dept TEXT NOT NULL\n);\n\n-- insert\nINSERT INTO EMPLOYEE VALUES (0001, 'Clark', 'Sales');\nINSERT INTO EMPLOYEE VALUES (0002, 'Dave', 'Accounting');\nINSERT INTO EMPLOYEE VALUES (0003, 'Ava', 'Sales');\n\n-- fetch \nSELECT * FROM EMPLOYEE;\n"
+    }
+]
