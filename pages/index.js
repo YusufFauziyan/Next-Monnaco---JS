@@ -103,21 +103,54 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    loader.init().then((monaco) => {
-      monaco.editor.addEditorAction({
-        precondition: null,
-        keybindingContext: null,
-        contextMenuGroupId: "navigation",
-        contextMenuOrder: 1,
-        id: `run-code`,
-        label: `Run Code`,
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
-        run: (editor) => {
-          const value = editor.getValue();
-          handleSubmitCode(value);
-        },
+    if (typeof window !== "undefined") {
+      loader.init().then((monaco) => {
+        monaco.editor.defineTheme("dark-editor-theme", {
+          base: "vs-dark",
+          inherit: true,
+          rules: [
+            {
+              token: "keyword",
+              foreground: "#7CDEF4",
+              fontStyle: "bold",
+            },
+            {
+              token: "comment",
+              foreground: "#637381",
+              fontStyle: "italic",
+            },
+            {
+              token: "string",
+              foreground: "#A5E844",
+            },
+            {
+              token: "variable",
+              foreground: "#FFD666",
+            },
+          ],
+          colors: {
+            "editor.background": "#161C24",
+            "editor.foreground": "#FBF9F1",
+            // 'editor.lineHighlightBackground': theme.palette.background.paper,
+            "editor.lineHighlightBorder": "#00000000",
+          },
+        });
+
+        monaco.editor.addEditorAction({
+          precondition: null,
+          keybindingContext: null,
+          contextMenuGroupId: "navigation",
+          contextMenuOrder: 1,
+          id: `run-code`,
+          label: `Run Code`,
+          keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+          run: (editor) => {
+            const value = editor.getValue();
+            handleSubmitCode(value);
+          },
+        });
       });
-    });
+    }
   }, []);
 
   return (
