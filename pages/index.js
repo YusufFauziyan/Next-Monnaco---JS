@@ -3,7 +3,7 @@ import { BsFillEmojiSmileUpsideDownFill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { BiLogoJavascript, BiSolidFileCss } from "react-icons/bi";
 
-import MonacoEditor from "@monaco-editor/react";
+import MonacoEditor, { loader } from "@monaco-editor/react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -15,6 +15,7 @@ import Example from "@/data/example.json";
 import { OptionsMonaco } from "@/hook/ConfigMonaco";
 import { GetTokenId } from "@/hook/Api";
 import { BodyExec } from "@/hook/BodyApi";
+import "./themeEditor";
 
 const inter = Inter({ subsets: ["latin"] });
 const poppins = Poppins({
@@ -27,10 +28,10 @@ const listLanguages = [
     name: "JavaScript",
     value: "javascript",
   },
-  {
-    name: "MYSQL",
-    value: "mysql",
-  },
+  // {
+  //   name: "MYSQL",
+  //   value: "mysql",
+  // },
 ];
 
 export default function Home() {
@@ -51,9 +52,9 @@ export default function Home() {
     }
   }, [tokenId]);
 
-  const handleSubmitCode = async () => {
+  const handleSubmitCode = async (value) => {
     setLoading(true);
-    const body = BodyExec("javascript", javascript);
+    const body = BodyExec("javascript", value);
 
     try {
       const { data } = await axios.post(
@@ -74,7 +75,7 @@ export default function Home() {
       // Cek apakah tombol yang ditekan adalah "Enter" dan Ctrl juga ditekan
       if (event.key === "Enter" && event.ctrlKey) {
         event.preventDefault(); // Mencegah aksi default (pindah baris dalam textarea, dll.)
-        handleSubmitCode(); // Eksekusi fungsi handleSubmitCode
+        handleSubmitCode(javascript); // Eksekusi fungsi handleSubmitCode
       }
     };
 
@@ -101,9 +102,27 @@ export default function Home() {
     ChangeLanguage("javascript");
   }, []);
 
+  useEffect(() => {
+    loader.init().then((monaco) => {
+      monaco.editor.addEditorAction({
+        precondition: null,
+        keybindingContext: null,
+        contextMenuGroupId: "navigation",
+        contextMenuOrder: 1,
+        id: `run-code`,
+        label: `Run Code`,
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+        run: (editor) => {
+          const value = editor.getValue();
+          handleSubmitCode(value);
+        },
+      });
+    });
+  }, []);
+
   return (
     <main
-      className={`${poppins.className} text-text-500 bg-main-500 h-[100vh] overflow-hidden`}
+      className={`${poppins.className} text-text-500 bg-[#161C24] h-[100vh] overflow-hidden`}
     >
       {/* navbar */}
       <nav className="px-4 bg-main-800 py-1.5 shadow shadow-slate-700/20">
@@ -112,7 +131,14 @@ export default function Home() {
             <BsFillEmojiSmileUpsideDownFill className="w-5 h-5" />
           </div>
 
-          <div className="absolute left-1/2 -translate-x-1/2 z-30">
+          <div>
+            <p className="font-semibold text-xs text-white opacity-60">
+              YuCompiler
+            </p>
+          </div>
+
+          {/* <div className="absolute left-1/2 -translate-x-1/2 z-30"> */}
+          <div className="absolute right-0  z-30">
             {/* <p className="text-sm font-semibold text-icon-js select-none">
               javascript
             </p> */}
@@ -120,14 +146,15 @@ export default function Home() {
               data={listLanguages}
               setSelected={setSelectedLanguage}
               selected={selectedLanguage}
+              disabled
             />
           </div>
 
           <div className="flex gap-4 items-center text-sm font-medium ">
-            <button className="hover:text-text-800 duration-150">Login</button>
+            {/* <button className="hover:text-text-800 duration-150">Login</button>
             <button className="text-icon-500 hover:text-icon-800 duration-150">
               SignUp
-            </button>
+            </button> */}
           </div>
         </div>
       </nav>
@@ -142,7 +169,7 @@ export default function Home() {
             <div />
             <button
               className="pr-6 text-icon-800 hover:opacity-50 duration-150"
-              onClick={handleSubmitCode}
+              onClick={() => handleSubmitCode(javascript)}
               disabled={loading}
             >
               {loading ? (
@@ -150,7 +177,7 @@ export default function Home() {
                   <Loading />
                 </div>
               ) : (
-                <FaPlay />
+                <FaPlay color="#A5E844" />
               )}
             </button>
           </div>
@@ -159,7 +186,7 @@ export default function Home() {
           {/* code editor */}
           <div className="h-1/2 px-4 py-2">
             <MonacoEditor
-              theme={"vs-dark"}
+              theme="dark-editor-theme"
               className="coba"
               height="100%"
               path={"javascript"}
@@ -189,7 +216,7 @@ export default function Home() {
 
               <div className=" py-2 h-full">
                 <MonacoEditor
-                  theme={"vs-dark"}
+                  theme="dark-editor-theme"
                   className="coba"
                   height="100%"
                   path={"json"}

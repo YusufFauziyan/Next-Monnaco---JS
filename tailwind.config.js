@@ -25,8 +25,8 @@ module.exports = {
           800: "#D1D1D1",
         },
         icon: {
-          500: "#72A24D",
-          800: "#5C843A",
+          500: "#A5E844",
+          800: "#4A8615",
           html: "#F78C6C",
           css: "#89DDFF",
           js: "#FFCB6B",

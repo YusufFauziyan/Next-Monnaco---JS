@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { Listbox, Transition } from "@headlessui/react";
 
-const Select = ({ data, selected, setSelected }) => {
+const Select = ({ data, selected, setSelected, disabled }) => {
   return (
     <div className="">
       <Listbox value={selected} onChange={setSelected}>
@@ -25,6 +25,7 @@ const Select = ({ data, selected, setSelected }) => {
                     }`
                   }
                   value={item}
+                  disabled={disabled}
                 >
                   {({ selected }) => (
                     <>
