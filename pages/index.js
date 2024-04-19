@@ -217,7 +217,7 @@ export default function Home() {
           {/* code editor */}
           <div className="h-1/2 px-4 py-2">
             <Editor
-              theme="vs-dark"
+              theme="dark-editor-theme"
               className="coba"
               height="100%"
               path={"javascript"}
@@ -247,7 +247,7 @@ export default function Home() {
 
               <div className=" py-2 h-full">
                 <Editor
-                  theme="vs-dark"
+                  theme="dark-editor-theme"
                   className="coba"
                   height="100%"
                   path={"json"}
