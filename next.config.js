@@ -8,7 +8,7 @@ const nextConfig = {
       },
     ];
   },
-  reactStrictMode: false,
+  reactStrictMode: true,
   env: {
     API_URL: "/api",
   },
