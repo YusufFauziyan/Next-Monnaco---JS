@@ -3,7 +3,7 @@ import { BsFillEmojiSmileUpsideDownFill } from "react-icons/bs";
 import { FaPlay } from "react-icons/fa";
 import { BiLogoJavascript, BiSolidFileCss } from "react-icons/bi";
 
-import MonacoEditor, { loader } from "@monaco-editor/react";
+import { loader, Editor } from "@monaco-editor/react";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -218,7 +218,7 @@ export default function Home() {
 
           {/* code editor */}
           <div className="h-1/2 px-4 py-2">
-            <MonacoEditor
+            <Editor
               // theme="editor-theme"
               className="coba"
               height="100%"
@@ -248,7 +248,7 @@ export default function Home() {
               </div>
 
               <div className=" py-2 h-full">
-                <MonacoEditor
+                <Editor
                   // theme="editor-theme"
                   className="coba"
                   height="100%"
