@@ -219,7 +219,7 @@ export default function Home() {
           {/* code editor */}
           <div className="h-1/2 px-4 py-2">
             <MonacoEditor
-              theme="dark-editor-theme"
+              // theme="editor-theme"
               className="coba"
               height="100%"
               path={"javascript"}
@@ -249,7 +249,7 @@ export default function Home() {
 
               <div className=" py-2 h-full">
                 <MonacoEditor
-                  theme="dark-editor-theme"
+                  // theme="editor-theme"
                   className="coba"
                   height="100%"
                   path={"json"}
