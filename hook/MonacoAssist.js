@@ -57,7 +57,7 @@ export const ChangeLanguage = (language) => {
           {
             label: "log",
             kind: monaco.languages.CompletionItemKind.Function,
-            insertText: "console.log('${1}')",
+            insertText: "console.log(${1})",
             insertTextRules:
               monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Console Output.",
