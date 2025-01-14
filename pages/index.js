@@ -251,7 +251,7 @@ export default function Home() {
                   className="coba"
                   height="100%"
                   path={"json"}
-                  value={consoleOutput.stdout || consoleOutput.stderr || ""}
+                  value={JSON.stringify(consoleOutput.stdout || consoleOutput.stderr || "", null, 2)}
                   defaultValue={""}
                   defaultLanguage={"json"}
                   options={{ readOnly: true, ...OptionsMonaco }}
